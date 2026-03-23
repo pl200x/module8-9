@@ -5,18 +5,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-/**
- * Main.java — Student CRM GUI
- * Works with Student.java and Exception/StudentNotExistException.java
- *
- * QA / Repository Master contribution
- */
 public class Main extends JFrame {
 
-    // ── Collections ──────────────────────────────────────────
     private final ArrayList<Student> studentList = new ArrayList<>();
 
-    // ── UI Components ─────────────────────────────────────────
     private JTextField tfName, tfAge, tfSearch;
     private JComboBox<String> cbGender, cbGrade;
     private JButton btnAdd, btnDelete, btnClear;
@@ -39,7 +31,6 @@ public class Main extends JFrame {
         setVisible(true);
     }
 
-    // ── Header ────────────────────────────────────────────────
     private JPanel buildHeader() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBackground(new Color(40, 44, 60));
@@ -58,7 +49,6 @@ public class Main extends JFrame {
         return p;
     }
 
-    // ── Form Panel ────────────────────────────────────────────
     private JPanel buildForm() {
         JPanel outer = new JPanel(new BorderLayout());
         outer.setPreferredSize(new Dimension(260, 0));
@@ -78,31 +68,26 @@ public class Main extends JFrame {
         cbGender = new JComboBox<>(new String[]{"1 - Male", "2 - Female", "3 - Other"});
         cbGrade  = new JComboBox<>(new String[]{"A","B","C","D","F"});
 
-        // Name
         gc.gridy = 0; gc.gridx = 0;
         card.add(new JLabel("Name *"), gc);
         gc.gridy = 1;
         card.add(tfName, gc);
 
-        // Age
         gc.gridy = 2;
         card.add(new JLabel("Age *"), gc);
         gc.gridy = 3;
         card.add(tfAge, gc);
 
-        // Gender
         gc.gridy = 4;
         card.add(new JLabel("Gender *"), gc);
         gc.gridy = 5;
         card.add(cbGender, gc);
 
-        // Grade
         gc.gridy = 6;
         card.add(new JLabel("Grade *"), gc);
         gc.gridy = 7;
         card.add(cbGrade, gc);
 
-        // Buttons
         gc.gridy = 8; gc.gridwidth = 1; gc.weightx = 0.5;
         gc.gridx = 0;
         btnAdd = new JButton("Add");
@@ -116,7 +101,6 @@ public class Main extends JFrame {
         btnClear.setFocusPainted(false);
         card.add(btnClear, gc);
 
-        // Search
         gc.gridy = 9; gc.gridx = 0; gc.gridwidth = 2;
         gc.insets = new Insets(16, 8, 4, 8);
         card.add(new JLabel("Search by name:"), gc);
@@ -124,7 +108,6 @@ public class Main extends JFrame {
         tfSearch = new JTextField();
         card.add(tfSearch, gc);
 
-        // Delete
         gc.gridy = 11; gc.insets = new Insets(8, 8, 8, 8);
         btnDelete = new JButton("Delete Selected");
         btnDelete.setBackground(new Color(200, 60, 60));
@@ -132,7 +115,6 @@ public class Main extends JFrame {
         btnDelete.setFocusPainted(false);
         card.add(btnDelete, gc);
 
-        // Listeners
         btnAdd.addActionListener(e -> addStudent());
         btnClear.addActionListener(e -> clearForm());
         btnDelete.addActionListener(e -> deleteStudent());
@@ -146,7 +128,6 @@ public class Main extends JFrame {
         return outer;
     }
 
-    // ── Table Panel ───────────────────────────────────────────
     private JPanel buildTable() {
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 10));
@@ -162,7 +143,6 @@ public class Main extends JFrame {
         table.setSelectionBackground(new Color(180, 200, 255));
         table.setGridColor(new Color(220, 222, 230));
 
-        // Grade color renderer
         table.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer() {
             public Component getTableCellRendererComponent(JTable t, Object v,
                     boolean sel, boolean foc, int row, int col) {
@@ -185,7 +165,6 @@ public class Main extends JFrame {
         return p;
     }
 
-    // ── Status Bar ────────────────────────────────────────────
     private JPanel buildStatus() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p.setBackground(new Color(240, 242, 248));
@@ -197,13 +176,10 @@ public class Main extends JFrame {
         return p;
     }
 
-    // ── Add Student (with Exception Handling) ─────────────────
     private void addStudent() {
-        // ── Exception Handling ──────────────────────────────
         String name = tfName.getText().trim();
         String ageStr = tfAge.getText().trim();
 
-        // Validate name
         if (name.isEmpty()) {
             showError("Name cannot be empty.");
             return;
@@ -217,7 +193,6 @@ public class Main extends JFrame {
             return;
         }
 
-        // Validate age — catches wrong data type (non-integer input)
         int age;
         try {
             age = Integer.parseInt(ageStr);
@@ -230,13 +205,10 @@ public class Main extends JFrame {
             return;
         }
 
-        // Gender: extract int from combo selection
         int gender = cbGender.getSelectedIndex() + 1;
 
-        // Grade: extract char from combo selection
         char grade = cbGrade.getSelectedItem().toString().charAt(0);
 
-        // Create Student using their existing Student class
         Student s = new Student(name, age, gender, grade);
         studentList.add(s);
 
@@ -246,7 +218,6 @@ public class Main extends JFrame {
         setStatus("✅ Added: " + name);
     }
 
-    // ── Delete Student (uses StudentNotExistException) ────────
     private void deleteStudent() {
         int row = table.getSelectedRow();
         if (row < 0) {
@@ -260,7 +231,6 @@ public class Main extends JFrame {
             "Confirm Delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (confirm != JOptionPane.YES_OPTION) return;
 
-        // ── Uses StudentNotExistException ─────────────────
         try {
             Student found = studentList.stream()
                 .filter(s -> s.getName().equals(name))
@@ -278,7 +248,6 @@ public class Main extends JFrame {
         }
     }
 
-    // ── Filter / Search ───────────────────────────────────────
     private void filterTable() {
         String q = tfSearch.getText().trim().toLowerCase();
         tableModel.setRowCount(0);
@@ -289,7 +258,6 @@ public class Main extends JFrame {
         }
     }
 
-    // ── Helpers ───────────────────────────────────────────────
     private void refreshTable() {
         tableModel.setRowCount(0);
         studentList.forEach(this::addRow);
@@ -318,7 +286,6 @@ public class Main extends JFrame {
 
     private void setStatus(String msg) { lblStatus.setText(msg); }
 
-    // ── Main Entry ────────────────────────────────────────────
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::new);
     }
